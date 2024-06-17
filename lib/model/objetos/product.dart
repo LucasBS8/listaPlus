@@ -1,6 +1,6 @@
 class Product {
     final int id;
-  final int? idCategoria;
+  final int idCategoria;
   final String nome;
   final double preco;
   final String descricao;
@@ -9,7 +9,7 @@ class Product {
   Product(
       {
       required this.id,
-      this.idCategoria,
+      required this.idCategoria,
       required this.nome,
       required this.preco,
       required this.descricao,
