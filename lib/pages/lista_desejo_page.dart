@@ -15,7 +15,7 @@ class _ListaDesejoPageState extends State<ListaDesejoPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Lista de desejos',
-            style: const TextStyle(fontWeight: FontWeight.bold)),
+            style: TextStyle(fontWeight: FontWeight.bold)),
       ),
       body: Center(
         child: Column(

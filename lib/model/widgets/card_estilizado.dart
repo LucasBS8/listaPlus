@@ -71,23 +71,22 @@ class CardCategoria extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      hoverColor: Theme.of(context).hoverColor,
-      borderRadius: BorderRadius.circular(10),
-      onTap: () {},
-      child: Container(
-        decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: Theme.of(context).shadowColor.withOpacity(0.05),
-              blurStyle: BlurStyle.outer,
-              blurRadius: 88,
-            ),
-          ],
-          color: Theme.of(context).hoverColor,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        width: 160,
+    return Container(
+                width: 160,
+      decoration: BoxDecoration(
+            boxShadow: [
+              BoxShadow(
+                color: Theme.of(context).shadowColor.withOpacity(0.05),
+                blurStyle: BlurStyle.outer,
+                blurRadius: 88,
+              ),
+            ],
+            color: Theme.of(context).hoverColor,
+            borderRadius: BorderRadius.circular(10),),
+      child: InkWell(
+        hoverColor: Theme.of(context).hoverColor,
+        borderRadius: BorderRadius.circular(10),
+        onTap: () {},
         child: Center(
           child: Column(
             children: [

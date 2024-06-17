@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:listaplus/model/objetos/category.dart';
-import 'package:listaplus/model/objetos/product.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PreferencesService {
@@ -11,7 +10,12 @@ class PreferencesService {
     final prefs = await SharedPreferences.getInstance();
     final List<String> categoryStringList =
         prefs.getStringList(_categoryKey) ?? [];
+
+    // Adiciona a nova categoria à lista existente
     categoryStringList.add(json.encode(category.toJson()));
+    print('Saving categories: $categoryStringList sfggfgfer' ); // Log para verificação
+
+    // Salva a lista atualizada no SharedPreferences
     await prefs.setStringList(_categoryKey, categoryStringList);
   }
 
@@ -19,6 +23,7 @@ class PreferencesService {
   static Future<List<Category>> getCategoria() async {
     final prefs = await SharedPreferences.getInstance();
     final List<String>? categoryStringList = prefs.getStringList(_categoryKey);
+    print('Loaded categories: $categoryStringList'); // Log para verificação
 
     if (categoryStringList != null) {
       return categoryStringList
@@ -28,6 +33,8 @@ class PreferencesService {
     }
     return [];
   }
+
+  
 }
 // Save/Create
 

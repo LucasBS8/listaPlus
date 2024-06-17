@@ -84,19 +84,19 @@ Future<List<Category>> categorias = PreferencesService.getCategoria();
             case 0:
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => CategoriasPage()),
+                MaterialPageRoute(builder: (context) => const CategoriasPage()),
               );
               break;
             case 1:
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => AddCategoriaPage()),
+                MaterialPageRoute(builder: (context) => const AddCategoriaPage()),
               );
               break;
             case 2:
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => ListaDesejoPage()),
+                MaterialPageRoute(builder: (context) => const ListaDesejoPage()),
               );
               break;
             default:

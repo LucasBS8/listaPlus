@@ -42,12 +42,15 @@ class _AddCategoriaPageState extends State<AddCategoriaPage> {
 
   Future<void> _saveImageLocally(File image) async {
     try {
-      final appDir = await getApplicationDocumentsDirectory();
+
       final fileName = path.basename(image.path);
-      final savedImage = await image.copy('${appDir.path}/$fileName');
+      final savedImage = await image.copy('assets/images/$fileName');
+
       setState(() {
         _selectedImage = savedImage;
       });
+
+      print('Image saved to: ${savedImage.path}');
     } catch (e) {
       print('Error saving image: $e');
     }
@@ -64,15 +67,9 @@ class _AddCategoriaPageState extends State<AddCategoriaPage> {
           Category(
             titulo: _nomeCategoriaController.text,
             descricao: _descricaoCategoriaController.text,
-            picture: kIsWeb ? _selectedImage : (_selectedImage as File).path,
+            picture: "assets/images/image1.png",
           );
         await PreferencesService.setCategoria(category);
-        _descricaoCategoriaController.clear();
-        _nomeCategoriaController.clear();
-        setState(() {
-          _selectedImage = null;
-        });
-        print(_selectedImage);
       } else {
         print('No image selected');
       }
