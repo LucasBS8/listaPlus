@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:listaplus/pages/splash_screen.dart';
-part 'src/theme/material_scheme.dart';
+ part 'src/theme/material_scheme.dart';
 
 void main() {
   runApp(const MyApp());
@@ -19,16 +19,13 @@ class MyApp extends StatelessWidget {
       theme: theme.light(),
       darkTheme: theme.dark(),
       themeMode:  ThemeMode.light,
+
       home: const SplashScreen(),
     );
   }
 }
 
 
-
-// import 'package:flutter/material.dart';
-// import 'package:shared_preferences/shared_preferences.dart';
-// import 'dart:convert';
 
 // void main() {
 //   runApp(TodoApp());

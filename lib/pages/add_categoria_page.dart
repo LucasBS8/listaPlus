@@ -22,6 +22,16 @@ class _AddCategoriaPageState extends State<AddCategoriaPage> {
       TextEditingController();
   final ImagePicker picker = ImagePicker();
   dynamic _selectedImage;
+  final PreferencesService _preferencesService = PreferencesService();
+  List<Category> _category = [];
+
+  
+  Future<void> _loadCategorys() async {
+    List<Category> categorys = await _preferencesService.getCategoria();
+    setState(() {
+      _category = categorys;
+    });
+  }
 
   Future<void> _pickImage() async {
     try {
@@ -42,7 +52,6 @@ class _AddCategoriaPageState extends State<AddCategoriaPage> {
 
   Future<void> _saveImageLocally(File image) async {
     try {
-
       final fileName = path.basename(image.path);
       final savedImage = await image.copy('assets/images/$fileName');
 
@@ -58,24 +67,28 @@ class _AddCategoriaPageState extends State<AddCategoriaPage> {
 
   Future<void> _addCategory() async {
     if (_nomeCategoriaController.text.isNotEmpty &&
-        _descricaoCategoriaController.text.isNotEmpty) {
-      if (_selectedImage != null) {
-        if (!kIsWeb && _selectedImage is File) {
-          await _saveImageLocally(_selectedImage);
-        }
-        Category category =
-          Category(
-            titulo: _nomeCategoriaController.text,
-            descricao: _descricaoCategoriaController.text,
-            picture: "assets/images/image1.png",
-          );
-        await PreferencesService.setCategoria(category);
-      } else {
-        print('No image selected');
+        _descricaoCategoriaController.text.isNotEmpty &&
+        _selectedImage != null) {
+      if (!kIsWeb && _selectedImage is File) {
+        await _saveImageLocally(_selectedImage);
       }
-    } else {
-      print('Fields cannot be empty');
+      setState(() {
+        _category.add(Category(
+          titulo: _nomeCategoriaController.text,
+          descricao: _descricaoCategoriaController.text,
+          picture: "assets/images/image1.png",
+        ));
+      });
+      await _preferencesService.setCategoria(_category);
+      _loadCategorys();
+      Navigator.pop(context);
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCategorys();
   }
 
   @override

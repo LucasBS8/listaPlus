@@ -71,33 +71,36 @@ class CardCategoria extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-                width: 160,
-      decoration: BoxDecoration(
-            boxShadow: [
-              BoxShadow(
-                color: Theme.of(context).shadowColor.withOpacity(0.05),
-                blurStyle: BlurStyle.outer,
-                blurRadius: 88,
-              ),
-            ],
-            color: Theme.of(context).hoverColor,
-            borderRadius: BorderRadius.circular(10),),
-      child: InkWell(
-        hoverColor: Theme.of(context).hoverColor,
-        borderRadius: BorderRadius.circular(10),
-        onTap: () {},
-        child: Center(
-          child: Column(
-            children: [
-              Image.asset(category.picture),
-              Padding(
-                padding: const EdgeInsets.all(14.0),
-                child: Text(category.titulo,
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
-              ),
-            ],
+    return InkWell(
+    
+      hoverColor: Theme.of(context).hoverColor,
+      borderRadius: BorderRadius.circular(10),
+      onTap: () {},
+      child: Container(
+        height: 160,
+        width: 160,
+        decoration: BoxDecoration(
+                    boxShadow: [
+          BoxShadow(
+            blurStyle: BlurStyle.outer,
+            color: Theme.of(context).shadowColor.withOpacity(0.05),
+            blurRadius: 88,
           ),
+        ],
+            borderRadius: BorderRadius.circular(10)),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Image.asset(category.picture,width: 140, height: 100, fit: BoxFit.contain),
+            ),
+            Container(
+              padding: EdgeInsets.symmetric(vertical: 5),
+              height: 40,
+              child: Text(category.titulo,
+                  style: const TextStyle(fontWeight: FontWeight.bold)),
+            ),
+          ],
         ),
       ),
     );

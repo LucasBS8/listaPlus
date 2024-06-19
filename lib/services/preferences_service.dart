@@ -3,37 +3,25 @@ import 'package:listaplus/model/objetos/category.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PreferencesService {
+
   static const String _categoryKey = 'category';
-
-  // Salvar uma única categoria
-  static Future<void> setCategoria(Category category) async {
+  
+  Future<void> setCategoria(List<Category> tasks) async {
     final prefs = await SharedPreferences.getInstance();
-    final List<String> categoryStringList =
-        prefs.getStringList(_categoryKey) ?? [];
-
-    // Adiciona a nova categoria à lista existente
-    categoryStringList.add(json.encode(category.toJson()));
-    print('Saving categories: $categoryStringList sfggfgfer' ); // Log para verificação
-
-    // Salva a lista atualizada no SharedPreferences
-    await prefs.setStringList(_categoryKey, categoryStringList);
+    final String encodedData =
+        json.encode(tasks.map((task) => task.toJson()).toList());
+    await prefs.setString(_categoryKey, encodedData);
   }
 
-  // Recuperar a lista de categorias
-  static Future<List<Category>> getCategoria() async {
+  Future<List<Category>> getCategoria() async {
     final prefs = await SharedPreferences.getInstance();
-    final List<String>? categoryStringList = prefs.getStringList(_categoryKey);
-    print('Loaded categories: $categoryStringList'); // Log para verificação
-
-    if (categoryStringList != null) {
-      return categoryStringList
-          .map((categoryString) =>
-              Category.fromJson(json.decode(categoryString)))
-          .toList();
+    final String? tasksString = prefs.getString(_categoryKey);
+    if (tasksString != null) {
+      final List<dynamic> decodedData = json.decode(tasksString);
+      return decodedData.map((json) => Category.fromJson(json)).toList();
     }
     return [];
   }
-
   
 }
 // Save/Create
