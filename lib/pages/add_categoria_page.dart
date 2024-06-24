@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:path_provider/path_provider.dart';
+import 'package:path_provider/path_provider.dart'; // Adicione este pacote
 import 'package:path/path.dart' as path;
 import 'package:listaplus/model/objetos/category.dart';
 import 'package:listaplus/services/preferences_service.dart';
@@ -23,15 +23,6 @@ class _AddCategoriaPageState extends State<AddCategoriaPage> {
   final ImagePicker picker = ImagePicker();
   dynamic _selectedImage;
   final PreferencesService _preferencesService = PreferencesService();
-  List<Category> _category = [];
-
-  
-  Future<void> _loadCategorys() async {
-    List<Category> categorys = await _preferencesService.getCategoria();
-    setState(() {
-      _category = categorys;
-    });
-  }
 
   Future<void> _pickImage() async {
     try {
@@ -52,8 +43,9 @@ class _AddCategoriaPageState extends State<AddCategoriaPage> {
 
   Future<void> _saveImageLocally(File image) async {
     try {
+      final directory = await getApplicationDocumentsDirectory();
       final fileName = path.basename(image.path);
-      final savedImage = await image.copy('assets/images/$fileName');
+      final savedImage = await image.copy('${directory.path}/$fileName');
 
       setState(() {
         _selectedImage = savedImage;
@@ -72,23 +64,14 @@ class _AddCategoriaPageState extends State<AddCategoriaPage> {
       if (!kIsWeb && _selectedImage is File) {
         await _saveImageLocally(_selectedImage);
       }
-      setState(() {
-        _category.add(Category(
-          titulo: _nomeCategoriaController.text,
-          descricao: _descricaoCategoriaController.text,
-          picture: "assets/images/image1.png",
-        ));
-      });
-      await _preferencesService.setCategoria(_category);
-      _loadCategorys();
-      Navigator.pop(context);
+      final newCategory = Category(
+        titulo: _nomeCategoriaController.text,
+        descricao: _descricaoCategoriaController.text,
+        picture: kIsWeb ? _selectedImage : _selectedImage.path,
+      );
+      await _preferencesService.setCategoria([newCategory]);
+      Navigator.pop(context, newCategory); // Retorna a nova categoria
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _loadCategorys();
   }
 
   @override
@@ -189,14 +172,10 @@ class _AddCategoriaPageState extends State<AddCategoriaPage> {
                     ),
                   ),
                 ),
-              )
+              ),
             ]
                 .map(
-                  (e) => Padding(
-                    padding: const EdgeInsets.all(15),
-                    child: e,
-                  ),
-                )
+                    (e) => Padding(padding: const EdgeInsets.all(15), child: e))
                 .toList(),
           ),
         ),
@@ -208,8 +187,7 @@ class _AddCategoriaPageState extends State<AddCategoriaPage> {
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.0),
-              ),
+                  borderRadius: BorderRadius.circular(8.0)),
               backgroundColor:
                   Theme.of(context).buttonTheme.colorScheme!.primaryContainer,
               textStyle: const TextStyle(color: Colors.white),
@@ -220,11 +198,7 @@ class _AddCategoriaPageState extends State<AddCategoriaPage> {
               children: [
                 Text(""),
                 Text("Salvar", style: TextStyle(color: Colors.white)),
-                Icon(
-                  Icons.save,
-                  color: Colors.white,
-                  opticalSize: 12,
-                )
+                Icon(Icons.save, color: Colors.white, opticalSize: 12),
               ],
             ),
           ),

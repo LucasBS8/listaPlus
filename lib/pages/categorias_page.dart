@@ -34,29 +34,45 @@ class CategoriasPageState extends State<CategoriasPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: appBar(),
-        body: Padding(
-          padding: const EdgeInsets.all(20),
-          child: SizedBox(
-            width: double.maxFinite,
-            child: Wrap(
-              alignment: WrapAlignment.center,
-              runSpacing: 18,
-              spacing: 14,
-              children: _category
-                  .map((category) => CardCategoria(category: category))
-                  .toList(),
-            ),
+      appBar: appBar(),
+      body: Padding(
+        padding: const EdgeInsets.all(20),
+        child: SizedBox(
+          width: double.maxFinite,
+          child: Wrap(
+            alignment: WrapAlignment.center,
+            runSpacing: 18,
+            spacing: 14,
+            children: _category
+                .map((category) => CardCategoria(category: category))
+                .toList(),
           ),
         ),
-        bottomNavigationBar: bottomNavigationBar());
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          final newCategory = await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const AddCategoriaPage()),
+          );
+
+          if (newCategory != null) {
+            setState(() {
+              _category.add(newCategory);
+            });
+          }
+        },
+        child: const Icon(Icons.add),
+      ),
+      bottomNavigationBar: bottomNavigationBar(),
+    );
   }
 
   AppBar appBar() {
     return AppBar(
       centerTitle: true,
       automaticallyImplyLeading: false,
-      backgroundColor: Colors.transparent,  
+      backgroundColor: Colors.transparent,
       title: const Text(
         'Todas as categorias',
         style: TextStyle(fontWeight: FontWeight.bold),
@@ -101,9 +117,18 @@ class CategoriasPageState extends State<CategoriasPage> {
             );
             break;
           case 2:
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const ListaDesejoPage()),
+            MenuBar(
+              children: [
+                MenuItemButton(
+                    onPressed: () {
+                      showAboutDialog(
+                        context: context,
+                        applicationName: 'MenuBar Sample',
+                        applicationVersion: '1.0.0',
+                      );
+                    },
+                    child: null),
+              ],
             );
             break;
           default:
