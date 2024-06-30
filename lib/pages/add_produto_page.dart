@@ -1,28 +1,47 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:listaplus/model/objetos/category.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
+import 'package:listaplus/model/objetos/category.dart';
+import 'package:listaplus/model/objetos/product.dart';
 import 'package:listaplus/services/preferences_service.dart';
 
-class AddCategoriaPage extends StatefulWidget {
+class AddProdutoPage extends StatefulWidget {
   final VoidCallback onSave;
-  const AddCategoriaPage({super.key, required this.onSave});
+  const AddProdutoPage({super.key, required this.onSave});
 
   @override
-  State<AddCategoriaPage> createState() => _AddCategoriaPageState();
+  State<AddProdutoPage> createState() => _AddProdutoPageState();
 }
 
-class _AddCategoriaPageState extends State<AddCategoriaPage> {
-  final TextEditingController _nomeCategoriaController =
-      TextEditingController();
-  final TextEditingController _descricaoCategoriaController =
+class _AddProdutoPageState extends State<AddProdutoPage> {
+  final TextEditingController _nomeProdutoController = TextEditingController();
+  final TextEditingController _precoProdutoController = TextEditingController();
+  final TextEditingController _descricaoProdutoController =
       TextEditingController();
   final ImagePicker _imagePicker = ImagePicker();
   File? _selectedImage;
   final PreferencesService _preferencesService = PreferencesService();
+  List<Category> _categories = [];
+  Category? _selectedCategory;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCategories();
+  }
+
+  Future<void> _loadCategories() async {
+    List<Category> categories = await _preferencesService.getCategoria();
+    setState(() {
+      _categories = categories;
+      if (categories.isNotEmpty) {
+        _selectedCategory = categories.first;
+      }
+    });
+  }
 
   Future<void> _pickImage() async {
     try {
@@ -34,7 +53,7 @@ class _AddCategoriaPageState extends State<AddCategoriaPage> {
         });
       }
     } catch (e) {
-      print('Erro ao selecionar imagem: $e');
+      print("Erro ao selecionar imagem: $e");
     }
   }
 
@@ -43,7 +62,6 @@ class _AddCategoriaPageState extends State<AddCategoriaPage> {
       final directory = await getApplicationDocumentsDirectory();
       final fileName = path.basename(image.path);
       final savedImage = await image.copy('${directory.path}/$fileName');
-      print('Imagem salva em: ${savedImage.path}');
       return savedImage;
     } catch (e) {
       print('Erro ao salvar imagem: $e');
@@ -51,29 +69,34 @@ class _AddCategoriaPageState extends State<AddCategoriaPage> {
     }
   }
 
-  Future<void> _addCategory() async {
-    if (_nomeCategoriaController.text.isNotEmpty &&
-        _descricaoCategoriaController.text.isNotEmpty &&
-        _selectedImage != null) {
+  Future<void> _addProduct() async {
+    if (_nomeProdutoController.text.isNotEmpty &&
+        _precoProdutoController.text.isNotEmpty &&
+        _descricaoProdutoController.text.isNotEmpty &&
+        _selectedImage != null &&
+        _selectedCategory != null) {
       File? savedImage = await _saveImageLocally(_selectedImage!);
       if (savedImage != null) {
-        int newId = await _preferencesService.getNextCategoryId();
-        final newCategory = Category(
+                int newId = await _preferencesService.getNextProductId();
+        final newProduct = Product(
           id: newId,
-          titulo: _nomeCategoriaController.text,
-          descricao: _descricaoCategoriaController.text,
+          idCategoria:
+              _selectedCategory!.id, // Usar o ID da categoria selecionada
+          nome: _nomeProdutoController.text,
+          preco: double.parse(_precoProdutoController.text),
+          descricao: _descricaoProdutoController.text,
           picture: savedImage.path,
         );
 
-        List<Category> categories = await _preferencesService.getCategoria();
-        categories.add(newCategory);
-        await _preferencesService.setCategoria(categories);
+        List<Product> products = await _preferencesService.getProduto();
+        products.add(newProduct);
+        await _preferencesService.setProduto(products);
 
         widget.onSave();
         Navigator.of(context).pop();
       }
     } else {
-      print("Todos os campos são obrigatórios.");
+        print("Todos os campos são obrigatórios.");
     }
   }
 
@@ -81,7 +104,7 @@ class _AddCategoriaPageState extends State<AddCategoriaPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Nova Categoria',
+        title: const Text('Novo Produto',
             style: TextStyle(fontWeight: FontWeight.bold)),
       ),
       body: SingleChildScrollView(
@@ -97,7 +120,7 @@ class _AddCategoriaPageState extends State<AddCategoriaPage> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: TextField(
-                    controller: _nomeCategoriaController,
+                    controller: _nomeProdutoController,
                     decoration: InputDecoration(
                       prefixIcon: Icon(Icons.shopping_basket_outlined,
                           color: Theme.of(context)
@@ -106,7 +129,7 @@ class _AddCategoriaPageState extends State<AddCategoriaPage> {
                               .onSurface),
                       border:
                           const OutlineInputBorder(borderSide: BorderSide.none),
-                      labelText: 'Nome da categoria',
+                      labelText: 'Nome do produto',
                     ),
                   ),
                 ),
@@ -116,7 +139,27 @@ class _AddCategoriaPageState extends State<AddCategoriaPage> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: TextField(
-                    controller: _descricaoCategoriaController,
+                    controller: _precoProdutoController,
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.attach_money,
+                          color: Theme.of(context)
+                              .buttonTheme
+                              .colorScheme!
+                              .onSurface),
+                      border:
+                          const OutlineInputBorder(borderSide: BorderSide.none),
+                      labelText: 'Preço do produto',
+                    ),
+                    keyboardType: TextInputType.number,
+                  ),
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).hoverColor,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: TextField(
+                    controller: _descricaoProdutoController,
                     decoration: InputDecoration(
                       prefixIcon: Icon(Icons.label_outline,
                           color: Theme.of(context)
@@ -125,8 +168,35 @@ class _AddCategoriaPageState extends State<AddCategoriaPage> {
                               .onSurface),
                       border:
                           const OutlineInputBorder(borderSide: BorderSide.none),
-                      labelText: 'Descrição da categoria',
+                      labelText: 'Descrição do produto',
                     ),
+                  ),
+                ),
+                Container(
+                  height: 60,
+                  width: double.maxFinite,
+                                    decoration: BoxDecoration(
+                    color: Theme.of(context).hoverColor,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: DropdownButton<Category>(
+                    isExpanded: true,
+                    value: _selectedCategory,
+                    onChanged: (Category? newValue) {
+                      setState(() {
+                        _selectedCategory = newValue;
+                      });
+                    },
+                    items: _categories
+                        .map<DropdownMenuItem<Category>>((Category category) {
+                      return DropdownMenuItem<Category>(
+                        value: category,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left:30.0),
+                          child: Text(category.titulo),
+                        ),
+                      );
+                    }).toList(),
                   ),
                 ),
                 InkWell(
@@ -190,7 +260,7 @@ class _AddCategoriaPageState extends State<AddCategoriaPage> {
                   Theme.of(context).buttonTheme.colorScheme!.primaryContainer,
               textStyle: const TextStyle(color: Colors.white),
             ),
-            onPressed: _addCategory,
+            onPressed: _addProduct,
             child: const Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [

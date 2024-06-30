@@ -1,9 +1,10 @@
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:listaplus/model/objetos/category.dart';
+import 'package:listaplus/model/objetos/product.dart';
 import 'package:listaplus/model/widgets/card_estilizado.dart';
 import 'package:listaplus/pages/add_categoria_page.dart';
-import 'package:listaplus/pages/lista_desejo_page.dart';
+import 'package:listaplus/pages/add_produto_page.dart';
 import 'package:listaplus/services/preferences_service.dart';
 
 class CategoriasPage extends StatefulWidget {
@@ -19,15 +20,24 @@ class CategoriasPageState extends State<CategoriasPage> {
   List<Category> _category = [];
 
   Future<void> _loadCategorys() async {
-    List<Category> categorys = await _preferencesService.getCategoria();
+    final categorys = await _preferencesService.getCategoria();
     setState(() {
       _category = categorys;
+    });
+  }
+
+  List<Product> _product = [];
+  Future<void> _loadProducts() async {
+    final products = await _preferencesService.getProduto();
+    setState(() {
+      _product = products;
     });
   }
 
   @override
   void initState() {
     _loadCategorys();
+    _loadProducts();
     super.initState();
   }
 
@@ -35,32 +45,41 @@ class CategoriasPageState extends State<CategoriasPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: appBar(),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: SizedBox(
-          width: double.maxFinite,
-          child: Wrap(
-            alignment: WrapAlignment.center,
-            runSpacing: 18,
-            spacing: 14,
-            children: _category
-                .map((category) => CardCategoria(category: category))
-                .toList(),
-          ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: SizedBox(
+              width: double.maxFinite,
+              child: Column(
+                children: [
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    runSpacing: 18,
+                    spacing: 14,
+                    children: _category
+                        .map((category) => CardCategoria(category: category))
+                        .toList(),
+                  ),
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    runSpacing: 18,
+                    spacing: 14,
+                    children: _product
+                        .map((product) => CardProduto(product: product))
+                        .toList(),
+                  ),
+                ],
+              )),
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final newCategory = await Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const AddCategoriaPage()),
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+                builder: (context) => AddCategoriaPage(
+                      onSave: () => _loadCategorys(),
+                    )),
           );
-
-          if (newCategory != null) {
-            setState(() {
-              _category.add(newCategory);
-            });
-          }
         },
         child: const Icon(Icons.add),
       ),
@@ -113,7 +132,9 @@ class CategoriasPageState extends State<CategoriasPage> {
           case 1:
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const AddCategoriaPage()),
+              MaterialPageRoute(
+                  builder: (context) =>
+                      AddProdutoPage(onSave: () => _loadProducts())),
             );
             break;
           case 2:

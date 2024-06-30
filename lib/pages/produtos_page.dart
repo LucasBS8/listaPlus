@@ -20,9 +20,9 @@ class _ProdutosPageState extends State<ProdutosPage> {
         child: Column(children: [
           CardProduto(
               product: Product(
+                  id: 1,
                   idCategoria: 1,
                   preco: 10.1,
-                  id: 1,
                   nome: 'Produto 1',
                   descricao: 'Descrição do produto 1',
                   picture: 'assets/images/image1.png')),

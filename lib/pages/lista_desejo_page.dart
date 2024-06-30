@@ -20,7 +20,7 @@ class _ListaDesejoPageState extends State<ListaDesejoPage> {
       body: Center(
         child: Column(
           children: [
-            CardListaDesejo(product: Product(descricao: "Nestle Nido Full Cream Milk Powder Instant", id: 1,idCategoria: 1,nome: "wswdf", picture: "assets/images/image1.png",preco: 10.0),)
+            CardListaDesejo(product: Product(id: 2,descricao: "Nestle Nido Full Cream Milk Powder Instant",idCategoria: 1,nome: "wswdf", picture: "assets/images/image1.png",preco: 10.0),)
           ]
         ),
       ),
