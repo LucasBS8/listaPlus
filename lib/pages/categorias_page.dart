@@ -49,20 +49,47 @@ class CategoriasPageState extends State<CategoriasPage> {
       appBar: appBar(),
       body: Stack(
         children: [
-          SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Wrap(
-                alignment: WrapAlignment.center,
-                runSpacing: 18,
-                spacing: 14,
-                children: _category
-                    .map(
-                        (category) => CardCategoria(category: category, products: _product,onPressed: () {_loadCategorys(); _loadCategorys();},))
-                    .toList(),
+          if (_category.isEmpty)
+            const Center(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                      'Crie uma nova categoria indo em \n menu > nova categoria',textAlign: TextAlign.center),
+                  SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.menu),
+                      Icon(Icons.arrow_forward_ios_rounded),
+                      Icon(Icons.category)
+                    ],
+                  )
+                ],
+              ),
+            )
+          else
+            SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Wrap(
+                  alignment: WrapAlignment.center,
+                  runSpacing: 18,
+                  spacing: 14,
+                  children: _category
+                      .map((category) => CardCategoria(
+                            category: category,
+                            products: _product,
+                            onPressed: () {
+                              _loadCategorys();
+                              _loadProducts();
+                            },
+                          ))
+                      .toList(),
+                ),
               ),
             ),
-          ),
           if (_showActionButtons)
             Container(
               padding: EdgeInsets.all(15),
@@ -164,7 +191,7 @@ class CategoriasPageState extends State<CategoriasPage> {
             _showActionButtons = false;
             break;
           case 1:
-                      Navigator.push(
+            Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const ListaDesejoPage()),
             );
