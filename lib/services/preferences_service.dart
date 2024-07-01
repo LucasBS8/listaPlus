@@ -7,9 +7,7 @@ class PreferencesService {
   static const String _categoryKey = 'categorys';
   static const String _productKey = 'products';
   static const String _categoryIdKey = 'categoryId';
-    static const String _productIdKey = 'productId';
-
-
+  static const String _productIdKey = 'productId';
 
   Future<void> setCategoria(List<Category> categories) async {
     final prefs = await SharedPreferences.getInstance();
@@ -36,7 +34,17 @@ class PreferencesService {
     return nextId;
   }
 
-    Future<void> setProduto(List<Product> products) async {
+  Future<void> deleteCategoria(int categoryId) async {
+    final List<Category> categories = await getCategoria();
+    categories.removeWhere((category) => category.id == categoryId);
+    await setCategoria(categories);
+
+    final List<Product> products = await getProduto();
+    products.removeWhere((product) => product.idCategoria == categoryId);
+    await setProduto(products);
+  }
+
+  Future<void> setProduto(List<Product> products) async {
     final prefs = await SharedPreferences.getInstance();
     final String encodedData =
         json.encode(products.map((product) => product.toJson()).toList());
@@ -52,11 +60,18 @@ class PreferencesService {
     }
     return [];
   }
-    Future<int> getNextProductId() async {
+
+  Future<int> getNextProductId() async {
     final prefs = await SharedPreferences.getInstance();
     final int currentId = prefs.getInt(_productIdKey) ?? 0;
     final int nextId = currentId + 1;
     await prefs.setInt(_productIdKey, nextId);
     return nextId;
+  }
+
+  Future<void> deleteProduto(int id) async {
+    final List<Product> products = await getProduto();
+    products.removeWhere((product) => product.id == id);
+    await setProduto(products);
   }
 }

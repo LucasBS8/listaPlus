@@ -5,6 +5,7 @@ import 'package:listaplus/model/objetos/product.dart';
 import 'package:listaplus/model/widgets/card_estilizado.dart';
 import 'package:listaplus/pages/add_categoria_page.dart';
 import 'package:listaplus/pages/add_produto_page.dart';
+import 'package:listaplus/pages/lista_desejo_page.dart';
 import 'package:listaplus/services/preferences_service.dart';
 
 class CategoriasPage extends StatefulWidget {
@@ -18,6 +19,7 @@ class CategoriasPageState extends State<CategoriasPage> {
   late Future<List<Category>> futureCategory;
   final PreferencesService _preferencesService = PreferencesService();
   List<Category> _category = [];
+  bool _showActionButtons = false;
 
   Future<void> _loadCategorys() async {
     final categorys = await _preferencesService.getCategoria();
@@ -45,43 +47,75 @@ class CategoriasPageState extends State<CategoriasPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: appBar(),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: SizedBox(
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Wrap(
+                alignment: WrapAlignment.center,
+                runSpacing: 18,
+                spacing: 14,
+                children: _category
+                    .map(
+                        (category) => CardCategoria(category: category, products: _product,))
+                    .toList(),
+              ),
+            ),
+          ),
+          if (_showActionButtons)
+            Container(
+              padding: EdgeInsets.all(15),
+              alignment: Alignment.centerRight,
               width: double.maxFinite,
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Wrap(
-                    alignment: WrapAlignment.center,
-                    runSpacing: 18,
-                    spacing: 14,
-                    children: _category
-                        .map((category) => CardCategoria(category: category))
-                        .toList(),
+                  FloatingActionButton(
+                    isExtended: true,
+                    tooltip: "nova categoria",
+                    heroTag: "nova categoria",
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => AddCategoriaPage(
+                            onSave: () {
+                              _loadCategorys();
+                              setState(() {
+                                _showActionButtons = false;
+                              });
+                            },
+                          ),
+                        ),
+                      );
+                    },
+                    child: const Icon(Icons.category),
                   ),
-                  Wrap(
-                    alignment: WrapAlignment.center,
-                    runSpacing: 18,
-                    spacing: 14,
-                    children: _product
-                        .map((product) => CardProduto(product: product))
-                        .toList(),
+                  const SizedBox(height: 10),
+                  FloatingActionButton(
+                    isExtended: true,
+                    tooltip: "novo produto",
+                    heroTag: "novo produto",
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => AddProdutoPage(
+                            onSave: () {
+                              _loadProducts();
+                              setState(() {
+                                _showActionButtons = false;
+                              });
+                            },
+                          ),
+                        ),
+                      );
+                    },
+                    child: const Icon(Icons.add_shopping_cart),
                   ),
                 ],
-              )),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-                builder: (context) => AddCategoriaPage(
-                      onSave: () => _loadCategorys(),
-                    )),
-          );
-        },
-        child: const Icon(Icons.add),
+              ),
+            ),
+        ],
       ),
       bottomNavigationBar: bottomNavigationBar(),
     );
@@ -102,7 +136,6 @@ class CategoriasPageState extends State<CategoriasPage> {
   AnimatedBottomNavigationBar bottomNavigationBar() {
     List<IconData> iconList = [
       Icons.home_outlined,
-      Icons.dashboard_outlined,
       Icons.shopping_bag_outlined,
       Icons.menu,
     ];
@@ -128,29 +161,19 @@ class CategoriasPageState extends State<CategoriasPage> {
               context,
               MaterialPageRoute(builder: (context) => const CategoriasPage()),
             );
+            _showActionButtons = false;
             break;
           case 1:
-            Navigator.push(
+                      Navigator.push(
               context,
-              MaterialPageRoute(
-                  builder: (context) =>
-                      AddProdutoPage(onSave: () => _loadProducts())),
+              MaterialPageRoute(builder: (context) => const ListaDesejoPage()),
             );
+            _showActionButtons = false;
             break;
           case 2:
-            MenuBar(
-              children: [
-                MenuItemButton(
-                    onPressed: () {
-                      showAboutDialog(
-                        context: context,
-                        applicationName: 'MenuBar Sample',
-                        applicationVersion: '1.0.0',
-                      );
-                    },
-                    child: null),
-              ],
-            );
+            setState(() {
+              _showActionButtons = !_showActionButtons;
+            });
             break;
           default:
         }
