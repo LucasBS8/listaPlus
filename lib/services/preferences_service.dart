@@ -26,6 +26,12 @@ class PreferencesService {
     return [];
   }
 
+  Future<Category?> getCategoriaById(int categoryId) async {
+    final List<Category> categories = await getCategoria();
+    return categories.firstWhere((category) => category.id == categoryId,
+        orElse: () => Category(id: 0, titulo: '', descricao: '', picture: ''));
+  }
+
   Future<int> getNextCategoryId() async {
     final prefs = await SharedPreferences.getInstance();
     final int currentId = prefs.getInt(_categoryIdKey) ?? 0;

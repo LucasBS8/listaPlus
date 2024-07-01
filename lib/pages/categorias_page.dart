@@ -58,7 +58,7 @@ class CategoriasPageState extends State<CategoriasPage> {
                 spacing: 14,
                 children: _category
                     .map(
-                        (category) => CardCategoria(category: category, products: _product,))
+                        (category) => CardCategoria(category: category, products: _product,onPressed: () {_loadCategorys(); _loadCategorys();},))
                     .toList(),
               ),
             ),
